@@ -1,0 +1,22 @@
+{
+  "name": "Hello this is Footprint",
+  "description": "Base Level Extension",
+  "version": "2.0",
+  "manifest_version": 3,
+  "permissions": ["activeTab", "tabs"],
+  "host_permissions": ["https://www.virustotal.com/*"],
+  "action": {
+      "default_popup": "popup.html",
+      "default_icon": "pixel-capybara-pack 1.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "background": {
+   
+    "service_worker": "background.js"
+}
+}
