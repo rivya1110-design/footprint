@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Footprint - Scan History</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1e1220;
+            color: #f0d6ee;
+            padding: 32px 24px;
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+        .header h1 {
+            font-size: 24px;
+            color: #ffc6f9;
+        }
+        .header p {
+            font-size: 13px;
+            color: #9a7898;
+            margin-top: 4px;
+        }
+
+        /* ── CLEAR BUTTON ── */
+        #clearBtn {
+            background: transparent;
+            border: 1px solid #4a2a4a;
+            color: #9a7898;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        #clearBtn:hover {
+            border-color: #d62020;
+            color: #d62020;
+        }
+
+        /* ── EMPTY STATE ── */
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9a7898;
+            font-size: 15px;
+        }
+        .empty span {
+            display: block;
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        /* ── SCAN CARDS ── */
+        .card {
+            background: #2a1a2a;
+            border: 1px solid #4a2a4a;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            transition: border-color 0.2s;
+        }
+        .card:hover { border-color: #cc60c1; }
+
+        /* coloured left bar */
+        .card-bar {
+            width: 4px;
+            min-width: 4px;
+            height: 100%;
+            border-radius: 4px;
+            align-self: stretch;
+        }
+        .bar-safe    { background: #50f366; }
+        .bar-warning { background: #ff9328; }
+        .bar-danger  { background: #d62020; }
+
+        .card-body { flex: 1; }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .risk-badge {
+            font-size: 12px;
+            font-weight: bold;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+        .badge-safe    { background: rgba(80,243,102,0.12); color: #50f366; }
+        .badge-warning { background: rgba(255,147,40,0.12); color: #ff9328; }
+        .badge-danger  { background: rgba(214,32,32,0.12);  color: #d62020; }
+
+        .card-time {
+            font-size: 11px;
+            color: #9a7898;
+        }
+        .card-url {
+            font-size: 13px;
+            color: #f0d6ee;
+            word-break: break-all;
+            margin-bottom: 8px;
+            font-family: monospace;
+        }
+        .flags-list {
+            list-style: none;
+            margin-top: 6px;
+        }
+        .flags-list li {
+            font-size: 12px;
+            color: #9a7898;
+            padding: 2px 0;
+        }
+        .flags-list li::before {
+            content: "⚑ ";
+            color: #cc60c1;
+        }
+        .no-flags {
+            font-size: 12px;
+            color: #50f366;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h1>🐾 Scan History</h1>
+            <p id="scanCount">Loading...</p>
+        </div>
+        <button id="clearBtn">🗑 Clear History</button>
+    </div>
+
+    <div id="historyList"></div>
+
+    <script src="scanhistory.js"></script>
+</body>
+</html>
