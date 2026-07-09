@@ -1,22 +1,466 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Footprint Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Footprint — Browse Safer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #1e1220;
+      --bg2:       #2a1a2a;
+      --bg3:       #3b2a3a;
+      --purple:    #cc60c1;
+      --pink:      #ffc6f9;
+      --danger:    #ff6b6b;
+      --safe:      #6bffb8;
+      --text:      #f0d6ee;
+      --muted:     #9a7898;
+      --border:    #4a2a4a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(30,18,32,0.92);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--pink);
+      text-decoration: none;
+    }
+    .nav-logo img {
+      width: 32px;
+      image-rendering: pixelated;
+    }
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--pink); }
+    .nav-cta {
+      background: var(--purple);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* ── HERO ── */
+    .hero {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 100px 24px 80px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      background: rgba(204,96,193,0.15);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--purple);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(40px, 6vw, 72px);
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--pink);
+      margin-bottom: 20px;
+    }
+    .hero h1 span {
+      color: var(--purple);
+    }
+    .hero p {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto 40px;
+    }
+    .hero-btns {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: var(--purple);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 28px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-secondary {
+      background: transparent;
+      color: var(--pink);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 28px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--purple); }
+
+    /* ── SCAN DEMO CARD ── */
+    .demo-wrap {
+      max-width: 600px;
+      margin: 60px auto 0;
+    }
+    .demo-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 24px;
+      text-align: left;
+    }
+    .demo-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+    }
+    .demo-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .demo-row:last-child { border-bottom: none; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dot.safe { background: var(--safe); }
+    .dot.danger { background: var(--danger); }
+    .dot.warn { background: #ffb347; }
+    .demo-url { font-size: 13px; color: var(--text); flex: 1; font-family: monospace; }
+    .demo-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .badge-safe   { background: rgba(107,255,184,0.12); color: var(--safe); }
+    .badge-danger { background: rgba(255,107,107,0.12); color: var(--danger); }
+    .badge-warn   { background: rgba(255,179,71,0.12);  color: #ffb347; }
+
+    /* ── FEATURES ── */
+    .features {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 24px;
+    }
+    .section-label {
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--purple);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 14px;
+    }
+    .section-title {
+      text-align: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      color: var(--pink);
+      margin-bottom: 56px;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: border-color 0.2s;
+    }
+    .feature-card:hover { border-color: var(--purple); }
+    .feature-icon {
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+    .feature-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--pink);
+      margin-bottom: 10px;
+    }
+    .feature-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 18px;
+    }
+    .feature-link {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--purple);
+      text-decoration: none;
+    }
+    .feature-link:hover { text-decoration: underline; }
+
+    /* ── HOW IT WORKS ── */
+    .how {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 80px 24px;
+    }
+    .how-inner { max-width: 800px; margin: 0 auto; }
+    .steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-top: 48px;
+    }
+    .step-item {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .step-item:last-child { border-bottom: none; }
+    .step-num {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      border-radius: 50%;
+      background: rgba(204,96,193,0.15);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--purple);
+    }
+    .step-body h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--pink);
+      margin-bottom: 6px;
+    }
+    .step-body p {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 40px 48px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    footer p { font-size: 13px; color: var(--muted); }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+    .footer-links a {
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .footer-links a:hover { color: var(--pink); }
+
+    @media (max-width: 600px) {
+      nav { padding: 14px 20px; }
+      .nav-links { display: none; }
+      .hero { padding: 60px 20px 40px; }
+      footer { padding: 32px 20px; flex-direction: column; align-items: flex-start; }
+    }
+  </style>
 </head>
 <body>
-    <div>
-        <h1> Welcome to Footprint! </h1>
-        <p> Protecting your digital Footprint </p>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="icon/pixel-capybara-pack 1.png" alt="Footprint">
+    Footprint
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="watermark.html">Watermark</a></li>
+    <li><a href="username.html">Username Check</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+  </ul>
+  <a href="#" class="nav-cta">Add to Chrome</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">🐾 Browser Extension</div>
+  <h1>Browse without leaving a <span>vulnerable</span> footprint.</h1>
+  <p>Footprint scans every site you visit, protects your images from AI theft, and detects identity impersonation — all in real time.</p>
+  <div class="hero-btns">
+    <a href="#" class="btn-primary">Add to Chrome — it's free</a>
+    <a href="#features" class="btn-secondary">See what it does</a>
+  </div>
+
+  <!-- LIVE SCAN DEMO CARD -->
+  <div class="demo-wrap">
+    <div class="demo-card">
+      <div class="demo-label">Recent scans</div>
+      <div class="demo-row">
+        <div class="dot safe"></div>
+        <div class="demo-url">github.com</div>
+        <span class="demo-badge badge-safe">Safe</span>
+      </div>
+      <div class="demo-row">
+        <div class="dot danger"></div>
+        <div class="demo-url">login-paypa1.verify-now.net</div>
+        <span class="demo-badge badge-danger">Dangerous</span>
+      </div>
+      <div class="demo-row">
+        <div class="dot warn"></div>
+        <div class="demo-url">free-gift-claim.com</div>
+        <span class="demo-badge badge-warn">Suspicious</span>
+      </div>
+      <div class="demo-row">
+        <div class="dot safe"></div>
+        <div class="demo-url">docs.google.com</div>
+        <span class="demo-badge badge-safe">Safe</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-label">What Footprint does</div>
+  <div class="section-title">Three shields. One extension.</div>
+  <div class="features-grid">
+
+    <div class="feature-card">
+      <div class="feature-icon">🔍</div>
+      <h3>URL & Site Scanner</h3>
+      <p>Every page you visit is automatically checked against VirusTotal's database and scanned for phishing keywords. Get an instant risk rating before you type a single password.</p>
+      <a href="dashboard.html" class="feature-link">View scan history →</a>
     </div>
 
+    <div class="feature-card">
+      <div class="feature-icon">🖼️</div>
+      <h3>AI-Resistant Image Protection</h3>
+      <p>Add an invisible digital watermark to your images that disrupts AI scrapers and proves ownership. Combines pixel-level noise with hidden identity data — your simplified Glaze.</p>
+      <a href="watermark.html" class="feature-link">Try the watermark tool →</a>
+    </div>
 
-<!-- <div class="card">
-    <h2>Websites Visited</h2>
-    <p id="count">0</p>
-</div>
+    <div class="feature-card">
+      <div class="feature-icon">👤</div>
+      <h3>Username Similarity Checker</h3>
+      <p>Paste a username and Footprint will flag accounts that look suspiciously similar — catching impersonators and fake profiles before they fool you or your followers.</p>
+      <a href="username.html" class="feature-link">Check a username →</a>
+    </div>
 
-<script src="script.js"></script> -->
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how">
+  <div class="how-inner">
+    <div class="section-label">How it works</div>
+    <div class="section-title">Up and running in 3 steps</div>
+    <div class="steps-list">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Install the Chrome extension</h4>
+          <p>One click from the Chrome Web Store. No account needed, no data collected.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Browse normally</h4>
+          <p>Footprint runs quietly in the background. The icon turns red if something looks off — green if you're safe.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Use the tools when you need them</h4>
+          <p>Click the extension to watermark images, check usernames, or see your full scan history on this dashboard.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2025 Footprint · Built by Rivyashiniy Jayaraj · APU FYP</p>
+  <ul class="footer-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="watermark.html">Watermark</a></li>
+    <li><a href="username.html">Username</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+  </ul>
+</footer>
 
 </body>
 </html>
