@@ -349,7 +349,7 @@
     <li><a href="username.html">Username Check</a></li>
     <li><a href="dashboard.html">Dashboard</a></li>
   </ul>
-  <a href="#" class="nav-cta">Add to Browser</a>
+  <a href="#" class="nav-cta">Add to Chrome</a>
 </nav>
 
 <!-- HERO -->
@@ -358,33 +358,35 @@
   <h1>Browse without leaving a <span>vulnerable</span> footprint.</h1>
   <p>Footprint scans every site you visit, protects your images from AI theft, and detects identity impersonation — all in real time.</p>
   <div class="hero-btns">
-    <a href="#" class="btn-primary">Add to Browser — it's free</a>
+    <a href="#" class="btn-primary">Add to Chrome — it's free</a>
     <a href="#features" class="btn-secondary">See what it does</a>
   </div>
 
   <!-- LIVE SCAN DEMO CARD -->
   <div class="demo-wrap">
     <div class="demo-card">
-      <div class="demo-label">Recent scans</div>
-      <div class="demo-row">
-        <div class="dot safe"></div>
-        <div class="demo-url">github.com</div>
-        <span class="demo-badge badge-safe">Safe</span>
-      </div>
-      <div class="demo-row">
-        <div class="dot danger"></div>
-        <div class="demo-url">login-paypa1.verify-now.net</div>
-        <span class="demo-badge badge-danger">Dangerous</span>
-      </div>
-      <div class="demo-row">
-        <div class="dot warn"></div>
-        <div class="demo-url">free-gift-claim.com</div>
-        <span class="demo-badge badge-warn">Suspicious</span>
-      </div>
-      <div class="demo-row">
-        <div class="dot safe"></div>
-        <div class="demo-url">docs.google.com</div>
-        <span class="demo-badge badge-safe">Safe</span>
+      <div class="demo-label" id="demoLabel">Recent scans</div>
+      <div id="recentScans">
+        <div class="demo-row">
+          <div class="dot safe"></div>
+          <div class="demo-url">github.com</div>
+          <span class="demo-badge badge-safe">Safe</span>
+        </div>
+        <div class="demo-row">
+          <div class="dot danger"></div>
+          <div class="demo-url">login-paypa1.verify-now.net</div>
+          <span class="demo-badge badge-danger">Dangerous</span>
+        </div>
+        <div class="demo-row">
+          <div class="dot warn"></div>
+          <div class="demo-url">free-gift-claim.com</div>
+          <span class="demo-badge badge-warn">Suspicious</span>
+        </div>
+        <div class="demo-row">
+          <div class="dot safe"></div>
+          <div class="demo-url">docs.google.com</div>
+          <span class="demo-badge badge-safe">Safe</span>
+        </div>
       </div>
     </div>
   </div>
@@ -400,7 +402,7 @@
       <div class="feature-icon">🔍</div>
       <h3>URL & Site Scanner</h3>
       <p>Every page you visit is automatically checked against VirusTotal's database and scanned for phishing keywords. Get an instant risk rating before you type a single password.</p>
-      <a href="scanhistory.html" class="feature-link">View scan history →</a>
+      <a href="scanshistory.html" class="feature-link">View scan history →</a>
     </div>
 
     <div class="feature-card">
@@ -429,7 +431,7 @@
       <div class="step-item">
         <div class="step-num">1</div>
         <div class="step-body">
-          <h4>Install the Browser extension</h4>
+          <h4>Install the Chrome extension</h4>
           <p>One click from the Chrome Web Store. No account needed, no data collected.</p>
         </div>
       </div>
@@ -461,6 +463,42 @@
     <li><a href="dashboard.html">Dashboard</a></li>
   </ul>
 </footer>
+
+<script>
+  // Only runs when this page is opened inside the extension
+  // (chrome-extension://... origin). On the plain hosted website,
+  // chrome.storage doesn't exist, so we just leave the placeholder rows.
+  if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
+    chrome.storage.local.get({ scanHistory: [] }, (data) => {
+      const history = data.scanHistory;
+      const container = document.getElementById("recentScans");
+      const label = document.getElementById("demoLabel");
+
+      if (history.length === 0) return; // keep placeholder demo rows
+
+      label.textContent = "Recent scans";
+      container.innerHTML = "";
+
+      history.slice(0, 4).forEach((scan) => {
+        let dotClass = "safe", badgeClass = "badge-safe", badgeText = "Safe";
+        if (scan.risk === "DANGER") { dotClass = "danger"; badgeClass = "badge-danger"; badgeText = "Dangerous"; }
+        else if (scan.risk === "WARNING") { dotClass = "warn"; badgeClass = "badge-warn"; badgeText = "Suspicious"; }
+
+        let displayUrl = scan.url;
+        try { displayUrl = new URL(scan.url).hostname; } catch (e) { /* keep raw url */ }
+
+        const row = document.createElement("div");
+        row.className = "demo-row";
+        row.innerHTML = `
+          <div class="dot ${dotClass}"></div>
+          <div class="demo-url">${displayUrl}</div>
+          <span class="demo-badge ${badgeClass}">${badgeText}</span>
+        `;
+        container.appendChild(row);
+      });
+    });
+  }
+</script>
 
 </body>
 </html>
