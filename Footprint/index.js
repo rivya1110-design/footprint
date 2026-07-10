@@ -2,21 +2,37 @@ document.addEventListener("DOMContentLoaded", () => {
     const container = document.getElementById("recentScans");
     const label = document.getElementById("demoLabel");
 
+    if (!container || !label) {
+        console.error("Recent scans elements were not found in index.html.");
+        return;
+    }
+
+    if (typeof chrome === "undefined" || !chrome.storage?.local) {
+        console.warn("Extension storage is unavailable on this page.");
+        return;
+    }
+
     function displayRecentScans() {
         chrome.storage.local.get({ scanHistory: [] }, (data) => {
-            const history = data.scanHistory;
+            if (chrome.runtime.lastError) {
+                console.error("Could not load scan history:", chrome.runtime.lastError.message);
+                return;
+            }
 
+            const history = Array.isArray(data.scanHistory) ? data.scanHistory : [];
             label.textContent = "Recent scans";
             container.innerHTML = "";
 
             if (history.length === 0) {
-                container.innerHTML = `
-                    <div class="demo-row">
-                        <div class="demo-url">
-                            No scans yet. Scan a website using the extension.
-                        </div>
-                    </div>
-                `;
+                const row = document.createElement("div");
+                row.className = "demo-row";
+
+                const message = document.createElement("div");
+                message.className = "demo-url";
+                message.textContent = "No scans yet. Scan a website using the extension.";
+
+                row.appendChild(message);
+                container.appendChild(row);
                 return;
             }
 
@@ -35,12 +51,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     badgeText = "Suspicious";
                 }
 
-                let displayUrl = scan.url;
-
+                let displayUrl = scan.url || "Unknown website";
                 try {
-                    displayUrl = new URL(scan.url).hostname;
+                    displayUrl = new URL(displayUrl).hostname;
                 } catch (error) {
-                    console.error("Invalid scan URL:", scan.url);
+                    console.warn("Invalid scan URL:", displayUrl);
                 }
 
                 const row = document.createElement("div");
@@ -57,18 +72,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 badge.className = `demo-badge ${badgeClass}`;
                 badge.textContent = badgeText;
 
-                row.appendChild(dot);
-                row.appendChild(url);
-                row.appendChild(badge);
+                row.append(dot, url, badge);
                 container.appendChild(row);
             });
         });
     }
 
-    // Display saved scans when index.html opens
     displayRecentScans();
 
-    // Update the section if a new scan is saved while the page is open
     chrome.storage.onChanged.addListener((changes, areaName) => {
         if (areaName === "local" && changes.scanHistory) {
             displayRecentScans();
