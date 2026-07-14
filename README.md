@@ -1,2 +1,2 @@
 # footprint
-Browser Extension for FYP 
+Browser Extension for FYP by Rivyashiniy Jayaraj (TP071899)
